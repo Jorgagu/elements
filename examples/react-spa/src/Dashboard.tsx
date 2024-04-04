@@ -1,4 +1,4 @@
-import { Session } from "@ory/client"
+import { Session } from "@ory/client-fetch"
 import { Typography } from "@ory/elements"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -15,12 +15,10 @@ export const Dashboard = () => {
   const createLogoutFlow = () => {
     // here we create a new logout URL which we can use to log the user out
     sdk
-      .createBrowserLogoutFlow(undefined, {
-        params: {
-          return_url: "/",
-        },
+      .createBrowserLogoutFlow({
+        returnTo: "/",
       })
-      .then(({ data }) => setLogoutUrl(data.logout_url))
+      .then((flow) => setLogoutUrl(flow.logout_url))
       .catch(sdkErrorHandler)
   }
 
@@ -29,7 +27,7 @@ export const Dashboard = () => {
     // if no session is found, we redirect to the login page
     sdk
       .toSession()
-      .then(({ data: session }) => {
+      .then((session) => {
         // we set the session data which contains the user Identifier and other traits.
         setSession(session)
         // Set logout flow

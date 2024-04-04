@@ -1,4 +1,4 @@
-import { RegistrationFlow, UpdateRegistrationFlowBody } from "@ory/client"
+import { RegistrationFlow, UpdateRegistrationFlowBody } from "@ory/client-fetch"
 import { UserAuthCard } from "@ory/elements"
 import { useCallback, useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
@@ -38,7 +38,7 @@ export const Registration = () => {
       sdk
         // the flow data contains the form fields, error messages and csrf token
         .getRegistrationFlow({ id: flowId })
-        .then(({ data: flow }) => setFlow(flow))
+        .then((flow) => setFlow(flow))
         .catch(sdkErrorHandler),
     [],
   )
@@ -54,7 +54,7 @@ export const Registration = () => {
         ...(returnTo && { returnTo: returnTo }),
         ...(loginChallenge && { loginChallenge: loginChallenge }),
       })
-      .then(({ data: flow }) => {
+      .then((flow) => {
         // Update URI query params to include flow id
         setSearchParams({ ["flow"]: flow.id })
         // Set the flow data
@@ -73,7 +73,7 @@ export const Registration = () => {
         flow: flow.id,
         updateRegistrationFlowBody: body,
       })
-      .then(({ data }) => {
+      .then((data) => {
         if ("continue_with" in data) {
           for (const cw of data.continue_with ?? []) {
             if (cw.action === "show_verification_ui") {
@@ -115,7 +115,7 @@ export const Registration = () => {
     <UserAuthCard
       flowType={"registration"}
       // we always need to pass the flow to the card since it contains the form fields, error messages and csrf token
-      flow={flow}
+      flow={flow as any}
       // the registration card needs a way to navigate to the login page
       additionalProps={{
         loginURL: {

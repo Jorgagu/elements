@@ -1,4 +1,4 @@
-import { RecoveryFlow, UpdateRecoveryFlowBody } from "@ory/client"
+import { RecoveryFlow, UpdateRecoveryFlowBody } from "@ory/client-fetch"
 import { UserAuthCard } from "@ory/elements"
 import { useCallback, useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
@@ -14,7 +14,7 @@ export const Recovery = () => {
     (flowId: string) =>
       sdk
         .getRecoveryFlow({ id: flowId })
-        .then(({ data: flow }) => setFlow(flow))
+        .then((flow) => setFlow(flow))
         .catch(sdkErrorHandler),
     [],
   )
@@ -27,7 +27,7 @@ export const Recovery = () => {
     sdk
       .createBrowserRecoveryFlow()
       // flow contains the form fields, error messages and csrf token
-      .then(({ data: flow }) => {
+      .then((flow) => {
         // Update URI query params to include flow id
         setSearchParams({ ["flow"]: flow.id })
         // Set the flow data
@@ -42,7 +42,7 @@ export const Recovery = () => {
 
     sdk
       .updateRecoveryFlow({ flow: flow.id, updateRecoveryFlowBody: body })
-      .then(({ data: flow }) => {
+      .then((flow) => {
         // Form submission was successful, show the message to the user!
         setFlow(flow)
       })
@@ -67,7 +67,7 @@ export const Recovery = () => {
     <UserAuthCard
       flowType={"recovery"}
       // the flow is always required since it contains the UI form elements, UI error messages and csrf token
-      flow={flow}
+      flow={flow as any}
       // the recovery form should allow users to navigate to the login page
       additionalProps={{
         loginURL: {

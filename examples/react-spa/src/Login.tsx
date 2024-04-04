@@ -1,4 +1,4 @@
-import { LoginFlow, UpdateLoginFlowBody } from "@ory/client"
+import { LoginFlow, UpdateLoginFlowBody } from "@ory/client-fetch"
 import { UserAuthCard } from "@ory/elements"
 import { useCallback, useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
@@ -47,8 +47,11 @@ export const Login = (): JSX.Element => {
     (flowId: string) =>
       sdk
         // the flow data contains the form fields, error messages and csrf token
-        .getLoginFlow({ id: flowId })
-        .then(({ data: flow }) => setFlow(flow))
+        .getLoginFlow(
+          { id: flowId },
+          { credentials: "include", redirect: "error" },
+        )
+        .then((flow) => setFlow(flow))
         .catch(sdkErrorHandler),
     [],
   )
@@ -58,6 +61,7 @@ export const Login = (): JSX.Element => {
 
   // Create a new login flow
   const createFlow = () => {
+    console.log("createFlow")
     sdk
       .createBrowserLoginFlow({
         refresh: true,
@@ -66,7 +70,8 @@ export const Login = (): JSX.Element => {
         ...(returnTo && { returnTo: returnTo }),
       })
       // flow contains the form fields and csrf token
-      .then(({ data: flow }) => {
+      .then((flow) => {
+        console.log("flow", flow)
         // Update URI query params to include flow id
         setSearchParams({ ["flow"]: flow.id })
         // Set the flow data
@@ -93,6 +98,7 @@ export const Login = (): JSX.Element => {
   useEffect(() => {
     // we might redirect to this page after the flow is initialized, so we check for the flowId in the URL
     const flowId = searchParams.get("flow")
+    console.log("flowId", flowId)
     // the flow already exists
     if (flowId) {
       getFlow(flowId).catch(createFlow) // if for some reason the flow has expired, we need to get a new one
@@ -109,7 +115,7 @@ export const Login = (): JSX.Element => {
     <UserAuthCard
       flowType={"login"}
       // we always need the flow data which populates the form fields and error messages dynamically
-      flow={flow}
+      flow={flow as any}
       // the login card should allow the user to go to the registration page and the recovery page
       additionalProps={{
         forgotPasswordURL: {

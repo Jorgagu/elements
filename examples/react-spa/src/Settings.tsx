@@ -1,4 +1,4 @@
-import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client"
+import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client-fetch"
 import {
   gridStyle,
   NodeMessages,
@@ -21,7 +21,7 @@ export const Settings = () => {
       sdk
         // the flow data contains the form fields, error messages and csrf token
         .getSettingsFlow({ id: flowId })
-        .then(({ data: flow }) => setFlow(flow))
+        .then((flow) => setFlow(flow))
         .catch(sdkErrorHandler),
     [],
   )
@@ -35,7 +35,7 @@ export const Settings = () => {
       // the flow contains the form fields, error messages and csrf token
       // depending on the Ory Network project settings, the form fields returned may vary
       .createBrowserSettingsFlow()
-      .then(({ data: flow }) => {
+      .then((flow) => {
         // Update URI query params to include flow id
         setSearchParams({ ["flow"]: flow.id })
         // Set the flow data
@@ -52,7 +52,7 @@ export const Settings = () => {
     sdk
       // submit the form data the user provided to Ory
       .updateSettingsFlow({ flow: flow.id, updateSettingsFlowBody: body })
-      .then(({ data: flow }) => {
+      .then((flow) => {
         setFlow(flow)
       })
       .catch(sdkErrorHandler)
@@ -88,7 +88,7 @@ export const Settings = () => {
         <UserSettingsCard
           key={index}
           // we always need to pass the component the flow since it contains the form fields, error messages and csrf token
-          flow={flow}
+          flow={flow as any}
           method={flowType}
           // include scripts for webauthn support
           includeScripts={true}

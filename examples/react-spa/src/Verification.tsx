@@ -1,4 +1,4 @@
-import { VerificationFlow, UpdateVerificationFlowBody } from "@ory/client"
+import { VerificationFlow, UpdateVerificationFlowBody } from "@ory/client-fetch"
 import { UserAuthCard } from "@ory/elements"
 import { useCallback, useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
@@ -27,7 +27,7 @@ export const Verification = (): JSX.Element => {
       sdk
         // the flow data contains the form fields, error messages and csrf token
         .getVerificationFlow({ id: flowId })
-        .then(({ data: flow }) => setFlow(flow))
+        .then((flow) => setFlow(flow))
         .catch(sdkErrorHandler),
     [],
   )
@@ -42,7 +42,7 @@ export const Verification = (): JSX.Element => {
         ...(returnTo && { returnTo: returnTo }),
       })
       // flow contains the form fields, error messages and csrf token
-      .then(({ data: flow }) => {
+      .then((flow) => {
         // Update URI query params to include flow id
         setSearchParams({ ["flow"]: flow.id })
         // Set the flow data
@@ -61,7 +61,7 @@ export const Verification = (): JSX.Element => {
         flow: flow.id,
         updateVerificationFlowBody: body,
       })
-      .then(({ data: flow }) => {
+      .then((flow) => {
         setFlow(flow)
       })
       .catch(sdkErrorHandler)
@@ -83,7 +83,7 @@ export const Verification = (): JSX.Element => {
     <UserAuthCard
       flowType={"verification"}
       // we always need to provide the flow data since it contains the form fields, error messages and csrf token
-      flow={flow}
+      flow={flow as any}
       // we want users to be able to go back to the login page from the verification page
       additionalProps={{
         signupURL: {
